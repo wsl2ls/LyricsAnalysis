@@ -1,6 +1,6 @@
 # lyricsAnalysis
 iOS音乐播放器之锁屏效果（仿网易云音乐和QQ音乐）+歌词解析
-
+简书地址：http://www.jianshu.com/p/35ce7e1076d2
 功能描述：锁屏歌曲信息、控制台远程控制音乐播放：暂停/播放、上一首/下一首、快进/快退、列表菜单弹框和拖拽控制台的进度条调节进度（结合了QQ音乐和网易云音乐在锁屏状态下的效果）、歌词解析并随音乐滚动显示。
 ![总效果预览图.gif](http://upload-images.jianshu.io/upload_images/1708447-a83f7e40b01e4f50.gif?imageMogr2/auto-orient/strip)
 
