@@ -248,6 +248,18 @@ iOS音乐播放器之锁屏效果（仿网易云音乐和QQ音乐）+歌词解�
 好了，就说这么多了，demo中注释的还算是清楚的，感兴趣的可以去look  look😀😀！
 觉得有帮助的话，别忘了给个star⭐️哈😀😀！
 
+>* 更新于2017/9/13  iOS11系统正式发布后 ， iOS11上不能像iOS11以下那样锁屏歌词和海报，iOS11把海报显示位置放到了左上方，而且大小变成了头像大小，可能是苹果为了锁屏界面的简洁，只保留了如下图的界面。
+
+![iOS11网易云音乐锁屏界面.PNG](http://upload-images.jianshu.io/upload_images/1708447-b928a71e1d44addb.PNG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+>* 更新于2018/3/7 上面提到 iOS11系统上 ，不能像以往那样显示锁屏歌词了，那锁屏歌词该怎么显示呢，网易云音乐给出了如下图的设计：她是把当前唱到的歌词放到了锁屏的副标题处，随着播放的进度而改变。
+```
+    [songDict setObject:@"当前歌词" forKey:MPMediaItemPropertyAlbumTitle];
+```
+
+![网易云音乐锁屏歌词.PNG](http://upload-images.jianshu.io/upload_images/1708447-3da0ee93b6b68b8e.PNG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
 欢迎扫描下方二维码关注——iOS开发进阶之路——微信公众号：iOS2679114653
 本公众号是一个iOS开发者们的分享，交流，学习平台，会不定时的发送技术干货，源码,也欢迎大家积极踊跃投稿，(择优上头条) ^_^分享自己开发攻城的过程，心得，相互学习，共同进步，成为攻城狮中的翘楚！
 
