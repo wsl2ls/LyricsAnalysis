@@ -42,13 +42,13 @@
     [super viewDidLoad];
     
     [self getLrcArray];
-    
+
     [self.player play];
-    
+
     [self playControl];
     
     [self.view addSubview:self.tableView];
-    
+     //添加远程锁屏控制
     [self createRemoteCommandCenter];
     
 }
@@ -88,13 +88,13 @@
     }];
     
     //    commandCenter.togglePlayPauseCommand 耳机线控的暂停/播放
-    
+    __weak typeof(self) weakSelf = self;
     [commandCenter.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-        [self.player pause];
+        [weakSelf.player pause];
         return MPRemoteCommandHandlerStatusSuccess;
     }];
     [commandCenter.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-        [self.player play];
+        [weakSelf.player play];
         return MPRemoteCommandHandlerStatusSuccess;
     }];
     //    [commandCenter.previousTrackCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
@@ -115,9 +115,9 @@
     
     //在控制台拖动进度条调节进度（仿QQ音乐的效果）
     [commandCenter.changePlaybackPositionCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-        CMTime totlaTime = self.player.currentItem.duration;
+        CMTime totlaTime = weakSelf.player.currentItem.duration;
         MPChangePlaybackPositionCommandEvent * playbackPositionEvent = (MPChangePlaybackPositionCommandEvent *)event;
-        [self.player seekToTime:CMTimeMake(totlaTime.value*playbackPositionEvent.positionTime/CMTimeGetSeconds(totlaTime), totlaTime.timescale) completionHandler:^(BOOL finished) {
+        [weakSelf.player seekToTime:CMTimeMake(totlaTime.value*playbackPositionEvent.positionTime/CMTimeGetSeconds(totlaTime), totlaTime.timescale) completionHandler:^(BOOL finished) {
         }];
         return MPRemoteCommandHandlerStatusSuccess;
     }];
@@ -135,6 +135,7 @@
     
     [self.player removeTimeObserver:_playerTimeObserver];
     _playerTimeObserver = nil;
+//    self.player = nil;
     
     MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
     [commandCenter.likeCommand removeTarget:self];
@@ -143,6 +144,7 @@
     [commandCenter.nextTrackCommand removeTarget:self];
     [commandCenter.skipForwardCommand removeTarget:self];
     [commandCenter.changePlaybackPositionCommand removeTarget:self];
+    commandCenter = nil;
 }
 #pragma mark -- Help Methods
 
@@ -216,7 +218,7 @@
         }
         
         //展示锁屏歌曲信息，上面监听屏幕锁屏和点亮状态的目的是为了提高效率
-        [self showLockScreenTotaltime:totalTime andCurrentTime:currentTime andLyricsPoster:isShowLyricsPoster];
+        [self showLockScreenTotaltime:totalTime andCurrentTime:currentTime andRate:weakSelf.player.rate andLyricsPoster:isShowLyricsPoster];
         
     }];
     
@@ -267,9 +269,9 @@
     
 }
 
-//展示锁屏歌曲信息：图片、歌词、进度、演唱者
-- (void)showLockScreenTotaltime:(float)totalTime andCurrentTime:(float)currentTime andLyricsPoster:(BOOL)isShow{
-    
+//展示锁屏歌曲信息：图片、歌词、进度、演唱者 播放速率
+- (void)showLockScreenTotaltime:(float)totalTime andCurrentTime:(float)currentTime andRate:(NSInteger)rate andLyricsPoster:(BOOL)isShow{
+
     NSMutableDictionary * songDict = [[NSMutableDictionary alloc] init];
     //设置歌曲题目
     [songDict setObject:@"多幸运" forKey:MPMediaItemPropertyTitle];
@@ -281,6 +283,9 @@
     [songDict setObject:[NSNumber numberWithDouble:totalTime]  forKey:MPMediaItemPropertyPlaybackDuration];
     //设置已经播放时长
     [songDict setObject:[NSNumber numberWithDouble:currentTime] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+    //设置播放速率
+    //注意：MPNowPlayingInfoCenter的rate 与 self.player.rate 是不同步的，也就是说[self.player pause]暂停播放后的速率rate是0，但MPNowPlayingInfoCenter的rate还是1，就会造成 在锁屏界面点击了暂停按钮，这个时候进度条表面看起来停止了走动，但是其实还是在计时，所以再点击播放的时候，锁屏界面进度条的光标会发生位置闪动， 所以我们需要在暂停或播放时保持播放速率一致
+    [songDict setObject:[NSNumber numberWithInteger:rate] forKey:MPNowPlayingInfoPropertyPlaybackRate];
     
     UIImage * lrcImage = [UIImage imageNamed:@"backgroundImage5.jpg"];
     if (isShow) {
