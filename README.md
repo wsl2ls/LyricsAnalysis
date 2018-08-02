@@ -245,8 +245,6 @@ iOS音乐播放器之锁屏效果（仿网易云音乐和QQ音乐）+歌词解�
                 }
             }
 ```
-好了，就说这么多了，demo中注释的还算是清楚的，感兴趣的可以去look  look😀😀！
-觉得有帮助的话，别忘了给个star⭐️哈😀😀！
 
 >* 更新于2017/9/13  iOS11系统正式发布后 ， iOS11上不能像iOS11以下那样锁屏歌词和海报，iOS11把海报显示位置放到了左上方，而且大小变成了头像大小，可能是苹果为了锁屏界面的简洁，只保留了如下图的界面。
 
@@ -259,6 +257,13 @@ iOS音乐播放器之锁屏效果（仿网易云音乐和QQ音乐）+歌词解�
 
 ![网易云音乐锁屏歌词.PNG](http://upload-images.jianshu.io/upload_images/1708447-3da0ee93b6b68b8e.PNG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+>* 更新于2018/8/2 
+> 最近有小猿反应了一个Bug：锁屏下暂停播放,过几秒再继续播放,进度条会跳一下,暂停越久跳越猛?
+> 查阅资料后发现：我们知道 player 有个 rate 属性，表示播放速率，为 0 的时候表示暂停，为 1.0 的时候表示播放，而MPNowPlayingInfoCenter的nowPlayingInfo也有一个键值MPNowPlayingInfoPropertyPlaybackRate表示速率rate，但是它 与 self.player.rate 是不同步的，也就是说[self.player pause]暂停播放后的速率rate是0，但MPNowPlayingInfoPropertyPlaybackRate还是1，就会造成 在锁屏界面点击了暂停按钮，这个时候进度条表面看起来停止了走动，但是其实还是在计时，所以再点击播放的时候，锁屏界面进度条的光标会发生位置闪动， 所以我们需要在监听播放状态时同步播放速率给MPNowPlayingInfoPropertyPlaybackRate。
+
+```
+ [songDict setObject:[NSNumber numberWithInteger:rate] forKey:MPNowPlayingInfoPropertyPlaybackRate];
+```
 
 欢迎扫描下方二维码关注——iOS开发进阶之路——微信公众号：iOS2679114653
 本公众号是一个iOS开发者们的分享，交流，学习平台，会不定时的发送技术干货，源码,也欢迎大家积极踊跃投稿，(择优上头条) ^_^分享自己开发攻城的过程，心得，相互学习，共同进步，成为攻城狮中的翘楚！
