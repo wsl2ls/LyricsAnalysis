@@ -42,13 +42,13 @@
     [super viewDidLoad];
     
     [self getLrcArray];
-
+    
     [self.player play];
-
+    
     [self playControl];
     
     [self.view addSubview:self.tableView];
-     //添加远程锁屏控制
+    //添加远程锁屏控制
     [self createRemoteCommandCenter];
     
 }
@@ -135,7 +135,7 @@
     
     [self.player removeTimeObserver:_playerTimeObserver];
     _playerTimeObserver = nil;
-//    self.player = nil;
+    //    self.player = nil;
     
     MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
     [commandCenter.likeCommand removeTarget:self];
@@ -168,6 +168,7 @@
     [session setActive:YES error:nil];
     [session setCategory:AVAudioSessionCategoryPlayback error:nil];
     
+    
     __weak ViewController * weakSelf = self;
     _playerTimeObserver = [weakSelf.player addPeriodicTimeObserverForInterval:CMTimeMake(0.1*30, 30) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
         
@@ -183,16 +184,15 @@
                 wslLrcEach * lrc = self.lrcArray[i];
                 if (lrc.time < currentTime) {
                     self.currentRow = i;
-                    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow: self.currentRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+                    NSIndexPath * currentIndexPath = [NSIndexPath indexPathForRow: self.currentRow inSection:0];
+                    [self.tableView scrollToRowAtIndexPath:currentIndexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
                     [self.tableView reloadData];
                     [self.lockScreenTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow: self. currentRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
                     [self.lockScreenTableView reloadData];
                     break;
                 }
             }
-            
         }
-        
         
         //监听锁屏状态 lock=1则为锁屏状态
         uint64_t locked;
@@ -271,7 +271,7 @@
 
 //展示锁屏歌曲信息：图片、歌词、进度、演唱者 播放速率
 - (void)showLockScreenTotaltime:(float)totalTime andCurrentTime:(float)currentTime andRate:(NSInteger)rate andLyricsPoster:(BOOL)isShow{
-
+    
     NSMutableDictionary * songDict = [[NSMutableDictionary alloc] init];
     //设置歌曲题目
     [songDict setObject:@"多幸运" forKey:MPMediaItemPropertyTitle];
@@ -338,6 +338,9 @@
         _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height ) style:UITableViewStyleGrouped];
         _tableView.dataSource = self;
         _tableView.delegate = self;
+        _tableView.estimatedRowHeight = 0;
+        _tableView.estimatedSectionFooterHeight = 0;
+        _tableView.estimatedSectionHeaderHeight = 0;
         
         UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
         imageView.image = [UIImage imageNamed:@"backgroundImage5.jpg"];
@@ -389,15 +392,23 @@
     _isDragging = YES;
 }
 
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
+    if (!decelerate) {
+        _isDragging = NO;
+    }
+}
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     _isDragging = NO;
+}
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView{
+    
 }
 
 - (void)dealloc{
     [self removeObserver];
 }
-
-
 
 
 - (BOOL)shouldAutorotate {
